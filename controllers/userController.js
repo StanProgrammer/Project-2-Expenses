@@ -19,7 +19,10 @@ exports.createUser = async (req, res, next) => {
     }
 }
 
-exports.displayLogin = (req, res, next) => {
+exports.displaySignUp = (req, res, next) => {
+    res.sendFile(path.join(rootDir, 'views', 'signup.html'))
+}
+exports.loginPage = (req, res, next) => {
     res.sendFile(path.join(rootDir, 'views', 'login.html'))
 }
 

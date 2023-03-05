@@ -25,6 +25,35 @@ exports.displaySignUp = (req, res, next) => {
 exports.loginPage = (req, res, next) => {
     res.sendFile(path.join(rootDir, 'views', 'login.html'))
 }
+exports.homePage = (req, res, next) => {
+    res.sendFile(path.join(rootDir, 'views', 'home.html'))
+}
+
+exports.checkUser= async (req,res,next)=>{
+    try{
+    const email=req.body.email
+    const password=req.body.password
+    // console.log(email,password);
+    const user1=await User.findAll({
+        where: {
+          email: email
+        }
+      })
+    //   console.log(user1);
+      if(user1.length===0){
+        res.status(404).send("User doesn't exists")
+      }
+      else if(user1[0].dataValues.password===password){
+        res.status(200).send('User Logging successfull')
+      }
+      else if(user1[0].dataValues.password!==password){
+        res.status(401).send('Wrong password')
+      }
+    //   console.log(user1[0].dataValues);
+    }catch(error){
+        console.log(error);
+    }
+}
 
 
 // exports.displayAll = (req, res, next) => {

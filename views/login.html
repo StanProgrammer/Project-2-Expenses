@@ -1,11 +1,7 @@
-
-
-<!DOCTYPE html>
 <html>
 <head>
+    <meta charset="utf-8">
     <style>
-        /* Made with love by Mutiullah Samim*/
-
 @import url('https://fonts.googleapis.com/css?family=Numans');
 
 html,body{
@@ -104,9 +100,6 @@ margin-left: 4px;
 
     <!--Fontawesome CDN-->
 	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
-
-	<!--Custom styles-->
-	<link rel="stylesheet" type="text/css" href="styles.css">
 </head>
 <body>
 <div class="container">
@@ -121,19 +114,19 @@ margin-left: 4px;
 				</div>
 			</div>
 			<div class="card-body">
-				<form>
+				<form id="myform">
 					<div class="input-group form-group">
 						<div class="input-group-prepend">
-							<span class="input-group-text"><i class="fas fa-user"></i></span>
+							<span class="input-group-text"><i class="fas fa-envelope"></i></span>
 						</div>
-						<input type="text" class="form-control" placeholder="username">
+						<input type="email" id="email" class="form-control" placeholder="email" required>
 						
 					</div>
 					<div class="input-group form-group">
 						<div class="input-group-prepend">
 							<span class="input-group-text"><i class="fas fa-key"></i></span>
 						</div>
-						<input type="password" class="form-control" placeholder="password">
+						<input type="password" id="password" class="form-control" placeholder="password" required>
 					</div>
 					<!-- <div class="row align-items-center remember">
 						<input type="checkbox">Remember Me
@@ -154,10 +147,44 @@ margin-left: 4px;
 		</div>
 	</div>
 </div>
-<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script>
-    
+    const myform = document.getElementById('myform')
+    const password = document.getElementById('password')
+    const email = document.getElementById('email')
+
+	myform.addEventListener('submit',async (e)=>{
+		e.preventDefault()
+		try{
+		const user1=await axios.post('http://localhost:3000/check',{
+                email:email.value,
+                password:password.value
+        })
+		alert('Login Successfull')
+		
+		if(user1.status===200){
+			window.location.href = "http://localhost:3000/home";
+		}
+		
+
+	}
+	catch(error){
+		console.log(error.response.status);
+		if(error.response.status===404){
+			alert("User doesn't exists")
+		}
+		else if(error.response.status===401){
+			alert("Wrong Password")
+		}
+		else(
+			alert('Sorry problem is from our side')
+		)
+	}
+	})
 </script>
 </body>
 </html>

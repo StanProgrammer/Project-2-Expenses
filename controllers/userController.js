@@ -42,7 +42,7 @@ exports.checkUser= async (req,res,next)=>{
 
     //   console.log(user1);
       if(user1.length===0){
-        res.status(404).send("User doesn't exists")
+        res.status(404).json({message:'User Doesnt Exists'})
       }
       const hash=user1[0].dataValues.password
       bcrypt.compare(password, hash, function(err, result) {
@@ -50,7 +50,7 @@ exports.checkUser= async (req,res,next)=>{
         res.status(200).json({message:'User Logging successfull'})
       }
       else if(result==false){
-        res.status(401).send('Wrong password')
+        res.status(401).json({message:'Wrong Password'})
       }
         // result == true
     });

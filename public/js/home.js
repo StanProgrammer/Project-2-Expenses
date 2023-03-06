@@ -28,6 +28,7 @@ form.addEventListener('submit', async (e) => {
             description: description,
             category: category
         })
+        
         window.location.reload()
         document.querySelector("#my-form").reset();
     } catch {

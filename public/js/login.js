@@ -10,14 +10,13 @@
                 password:password.value
         })
 		alert(user1.data.message)
-		
+		const token = user1.data.token
 		if(user1.status===200){
-			
-			window.location.href = "http://localhost:3000/home";
+			window.location.href = "http://localhost:3000/home"
 		}
 	}
+	
 	catch(error){
-		console.log(error.response.status);
 		if(error.response.status===404){
 			alert("User doesn't exists")
 		}

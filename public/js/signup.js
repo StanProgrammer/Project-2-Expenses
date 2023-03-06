@@ -7,7 +7,6 @@ const loginbtn=document.getElementById('loginbtn')
 
 myForm.addEventListener('submit',async (e)=>{
     e.preventDefault()
-    // console.log('Hello');
     const name=document.getElementById('name')
     const email=document.getElementById('email')
     const phone=document.getElementById('phone')

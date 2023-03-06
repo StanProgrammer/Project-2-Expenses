@@ -2,6 +2,7 @@ const path = require('path')
 const rootDir = path.dirname(require.main.filename);
 const User = require('../models/users')
 const bcrypt = require('bcrypt')
+const session = require('./sessionController')
 exports.createUser = async (req, res, next) => {
     try{
         const name = req.body.name

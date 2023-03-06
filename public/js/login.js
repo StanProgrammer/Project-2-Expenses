@@ -12,6 +12,7 @@
 		alert(user1.data.message)
 		
 		if(user1.status===200){
+			
 			window.location.href = "http://localhost:3000/home";
 		}
 	}

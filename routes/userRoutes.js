@@ -1,9 +1,13 @@
 const express = require('express')
 const router = express.Router()
 const userController = require('../controllers/userController')
+const expenseController = require('../controllers/expenseController')
 router.get('/',userController.displaySignUp)
 router.use('/login',userController.createUser)
 router.get('/loginPage',userController.loginPage)
 router.use('/check',userController.checkUser)
 router.get('/home',userController.homePage)
+router.use('/home/expense',expenseController.createExpense)
+router.get('/home/show',expenseController.displayAll)
+router.get('/home/delete',expenseController.deleteExpense)
 module.exports=router

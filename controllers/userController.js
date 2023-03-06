@@ -13,14 +13,16 @@ exports.createUser = async (req, res, next) => {
     const phone = req.body.phone
     const password = req.body.password
     const existsuser1 = await User.findOne({ email: email })
-    if (existsuser1) {
-      return res.status(400).json('User already exists')
-    }
+    // if (existsuser1) {
+    //   return res.status(400).json('User already exists')
+    // }
+    // console.log(existsuser1)
 
     const saltrounds = 10
     const hashPassword = await bcrypt.hash(password, saltrounds)
     const result = await User.create({ name: name, email: email, phone: phone, password: hashPassword })
     const token = jwt.sign({ email: result.email, id: result.id }, SECRET_KEY)
+    ls('token',token)
     res.status(201).json({ message: 'Successfully Created', token: token })
 
     // res.redirect('/')

@@ -23,14 +23,16 @@ exports.createUser = async (req, res, next) => {
     const result = await User.create({ name: name, email: email, phone: phone, password: hashPassword })
     const token = jwt.sign({ email: result.email, id: result.id }, SECRET_KEY)
     ls('token',token)
-    res.status(201).json({ message: 'Successfully Created', token: token })
+    res.status(201).json({ message: 'Successfully Created', token: token, userId: result.id })
 
     // res.redirect('/')
   } catch (err) {
     return res.status(400).send();
   }
 }
-
+function generateAcessToken(id,name){
+  return jwt.sign({userId : id, name: name},SECRET_KEY)
+}
 exports.displaySignUp = (req, res, next) => {
   res.sendFile(path.join(rootDir, 'views', 'signup.html'))
 }
@@ -56,7 +58,7 @@ exports.checkUser = async (req, res, next) => {
       }
       const token = jwt.sign({ email: user1.email, id: user1.id }, SECRET_KEY)
       ls('token',token)
-      res.status(200).json({ message: 'User Logging successfull', token: token })
+      res.status(200).json({ message: 'User Logging successfull', token: generateAcessToken(user1.id,user1.name), userId:user1.id })
       
     });
   } catch (error) {

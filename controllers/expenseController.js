@@ -3,14 +3,18 @@ const rootDir = path.dirname(require.main.filename);
 const User = require('../models/users')
 const bcrypt = require('bcrypt')
 const Expense = require('../models/expense')
+const jwt = require('jsonwebtoken')
+const SECRET_KEY = 'ATIBAPI'
 exports.createExpense = (req, res, next) => {
     const amount = req.body.amount
     const description = req.body.description
     const category = req.body.category
+    const id = req.body.userId
     Expense.create({
         amount: amount,
         description: description,
-        category: category
+        category: category,
+        userId: id
     })
         .then(() => {
             res.redirect('/home')
@@ -19,7 +23,15 @@ exports.createExpense = (req, res, next) => {
 }
 
 exports.displayAll = (req, res, next) => {
-    Expense.findAll()
+    const token = req.get('Authorization')
+    const user = jwt.verify(token, SECRET_KEY);
+    console.log(user);
+    const id=user.userId
+    Expense.findAll({
+        where:{
+            userId: id
+        }
+    })
         .then((result) => {
             res.json(result)
         })
@@ -27,7 +39,10 @@ exports.displayAll = (req, res, next) => {
 }
 
 exports.deleteExpense = (req, res, next) => {
-    const id = req.query.id;
+    const token = req.get('Authorization')
+    const user = jwt.verify(token, SECRET_KEY);
+    console.log(user);
+    const id=user.userId
     Expense.findByPk(id)
     .then(user => {
         return user.destroy();

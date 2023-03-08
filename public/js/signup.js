@@ -19,19 +19,14 @@ myForm.addEventListener('submit',async (e)=>{
             phone:phone.value,
             password:password.value
         })
-        const token = user1.data.token
-		    const id = user1.data.userId
-        // user1.setHeader("Authorization",token)
-        // axios.setHeader('UserId',user1.id)
-        localStorage.setItem('token',token);
-        localStorage.setItem('id',id);
-        alert(user1.data.message,'you can login now')
+        
+        alert(user1.data.message)
         window.location.href = "http://localhost:3000/loginPage";
     }catch(error){
-          console.log(error);
-          // if(confirm('User already exists')){
-          //   window.location.reload()
-          // }
+
+          if(confirm('User already exists')){
+            window.location.reload()
+          }
           
     } 
 
@@ -44,4 +39,3 @@ loginbtn.addEventListener('click',async()=>{
     console.log(err);
   }
 })
-//SETHEADERS IN SIGNUP FOR 

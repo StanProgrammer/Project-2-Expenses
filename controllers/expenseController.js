@@ -6,10 +6,12 @@ const Expense = require('../models/expense')
 const jwt = require('jsonwebtoken')
 const SECRET_KEY = 'ATIBAPI'
 exports.createExpense = (req, res, next) => {
+    const token = req.header('Authorization');
+    const user = jwt.verify(token, SECRET_KEY);
+    const id=user.id
     const amount = req.body.amount
     const description = req.body.description
     const category = req.body.category
-    const id = req.body.userId
     Expense.create({
         amount: amount,
         description: description,
@@ -23,10 +25,10 @@ exports.createExpense = (req, res, next) => {
 }
 
 exports.displayAll = (req, res, next) => {
-    const token = req.get('Authorization')
+    const token = req.header('Authorization');
     const user = jwt.verify(token, SECRET_KEY);
-    console.log(user);
-    const id=user.userId
+    const id=user.id
+    console.log(id);
     Expense.findAll({
         where:{
             userId: id
@@ -38,19 +40,16 @@ exports.displayAll = (req, res, next) => {
         .catch(err => console.log(err))
 }
 
-exports.deleteExpense = (req, res, next) => {
-    const token = req.get('Authorization')
+exports.deleteExpense = async (req, res, next) => {
+    try{
+        const expenseId = req.params.expenseId;
+    const token = req.header('Authorization');
     const user = jwt.verify(token, SECRET_KEY);
-    console.log(user);
-    const id=user.userId
-    Expense.findByPk(id)
-    .then(user => {
-        return user.destroy();
-    })
-    .then(result => {
-        res.redirect('/');
-    })
-    .catch(err => {
-        console.log(err);
-    })
+    const id=user.id
+    const expenseField = await Expense.findByPk(expenseId, {where: { userId: id}})
+    await expenseField.destroy();
+    res.status(201).json({delete: expenseField})
+}catch(error){
+    console.log(error);
+}
 }

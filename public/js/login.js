@@ -11,9 +11,7 @@
         })
 		alert(user1.data.message)
 		const token = user1.data.token
-		const id = user1.data.userId
 		localStorage.setItem('token',token);
-		localStorage.setItem('id',id);
 		if(user1.status===200){
 			window.location.href = "http://localhost:3000/home"
 		}
@@ -21,14 +19,6 @@
 	
 	catch(error){
 		console.log(error);
-		// if(error.response.status===404){
-		// 	alert("User doesn't exists")
-		// }
-		// else if(error.response.status===401){
-		// 	alert("Wrong Password")
-		// }
-		// else(
-		// 	alert('Sorry problem is from our side')
-		// )
+		
 	}
 	})

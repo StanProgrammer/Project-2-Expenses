@@ -13,4 +13,7 @@ router.get('/home/show',auth.auth,expenseController.displayAll)
 router.get('/home/delete/:expenseId',auth.auth,expenseController.deleteExpense)
 router.post('/home/edit-expense/:expenseId', expenseController.editExpense);
 router.get('/password', userController.forgot);
+router.get('/download', auth.auth, expenseController.getDownloadExpenses);
+router.get('/getAllUrl', auth.auth, expenseController.getDownloadAllUrl);
+
 module.exports=router

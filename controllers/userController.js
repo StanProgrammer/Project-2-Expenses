@@ -5,8 +5,6 @@ const bcrypt = require('bcrypt')
 const session = require('./sessionController')
 const jwt = require('jsonwebtoken')
 const SECRET_KEY = 'ATIBAPI'
-const Sib = require('sib-api-v3-sdk');
-require('dotenv').config();
 exports.createUser = async (req, res, next) => {
   try {
     const name = req.body.name
@@ -67,32 +65,3 @@ exports.checkUser = async (req, res, next) => {
 }
 
 
-exports.postForgotPassword = async (req,res,next) => {
-  try {
-      const client = Sib.ApiClient.instance;
-      const apiKey = client.authentications['api-key']
-      apiKey.apiKey = process.env.SENDINBLUE_API_KEY;
-      const tranEmailApi = new Sib.TransactionalEmailsApi();
-
-      const sender = {
-          email: 'atibkhan392@gmail.com',
-          name: 'Atib khan'
-      }
-
-      const receivers = [
-          {
-          email: `${req.body.email}`
-          }
-      ]
-
-      await tranEmailApi.sendTransacEmail({
-          sender,
-          to: receivers,
-          subject: 'Reset Password',
-          textContent: `Password Reset`
-      }).then(res=>console.log(res)).catch(err=>console.log(err))
-      res.status(201).json({success: true,message: 'Reset Password Success'})
-  } catch(err) {
-      console.log(err);
-  }
-}

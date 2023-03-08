@@ -3,8 +3,6 @@ let amount = document.querySelector('#amount');
 let description = document.querySelector('#description');
 let category = document.querySelector('#category');
 const token = localStorage.getItem('token');
-const leaderboardList = document.getElementById('leaderboard-list');
-const leaderboardBtn = document.getElementById('leaderboard-btn');
 expense = {
     amount: amount.value,
     description: description.value,
@@ -161,26 +159,26 @@ document.getElementById('premium').onclick = async function (e) {
         rzrp1.close()
     })
 }
-const leaderboardDisplayed = false;
-const leaderboardElements = [];
+let leaderboardDisplayed = false;
+let leaderboardElements = [];
+let leaderboardList = document.getElementById('leaderboard-list');
+let leaderboardBtn = document.getElementById('leaderboard-btn');
 
-console.log(leaderboardBtn);
 axios.get("http://localhost:3000/premium/show-leaderboard", { headers: { "authorization": token } })
     .then(res => {
         for (let i = 0; i < res.data.length; i++) {
             const li = document.createElement("li");
             li.id = "leaderboard-li"
             li.appendChild(document.createTextNode(` Name : ${res.data[i].name} ,`));
-            li.appendChild(document.createTextNode(`Total Expense : ${res.data[i].total_amount || 0}`));
+            li.appendChild(document.createTextNode(`Total Expense : ${res.data[i].total_cost || 0}`));
             leaderboardElements.push(li);
         }
     })
     .catch(err => {
         console.log(err)
     })
-   
-    document.getElementById('leaderboard-btn').onclick = (e) => {
-    console.log(1);
+
+leaderboardBtn.onclick = (e) => {
     e.preventDefault();
     document.getElementById('leaderboard-tracker').removeAttribute('hidden');
 

@@ -5,17 +5,14 @@ const bcrypt = require('bcrypt')
 const session = require('./sessionController')
 const jwt = require('jsonwebtoken')
 const SECRET_KEY = 'ATIBAPI'
+const Sib = require('sib-api-v3-sdk');
+require('dotenv').config();
 exports.createUser = async (req, res, next) => {
   try {
     const name = req.body.name
     const email = req.body.email
     const phone = req.body.phone
     const password = req.body.password
-    // const existsuser1 = await User.findOne({ email: email })
-    // if (existsuser1) {
-    //   return res.status(400).json('User already exists')
-    // }
-    // console.log(existsuser1)
 
     const saltrounds = 10
     const hashPassword = await bcrypt.hash(password, saltrounds)
@@ -33,6 +30,9 @@ exports.generateAccessToken=(id, name,email, isPremiumUser) => {
 
 exports.displaySignUp = (req, res, next) => {
   res.sendFile(path.join(rootDir, 'views', 'signup.html'))
+}
+exports.forgot = (req, res, next) => {
+  res.sendFile(path.join(rootDir, 'views', 'forgotpassword.html'))
 }
 exports.loginPage = (req, res, next) => {
   res.sendFile(path.join(rootDir, 'views', 'login.html'))
@@ -67,25 +67,32 @@ exports.checkUser = async (req, res, next) => {
 }
 
 
-// exports.displayAll = (req, res, next) => {
-//     User.findAll()
-//         .then((result) => {
-//             res.json(result)
-//         })
-//         .catch(err => console.log(err))
-// }
+exports.postForgotPassword = async (req,res,next) => {
+  try {
+      const client = Sib.ApiClient.instance;
+      const apiKey = client.authentications['api-key']
+      apiKey.apiKey = process.env.SENDINBLUE_API_KEY;
+      const tranEmailApi = new Sib.TransactionalEmailsApi();
 
+      const sender = {
+          email: 'atibkhan392@gmail.com',
+          name: 'Atib khan'
+      }
 
-// exports.deleteOne = (req, res, next) => {
-//     const id = req.query.id;
-//     User.findByPk(id)
-//     .then(user => {
-//         return user.destroy();
-//     })
-//     .then(result => {
-//         res.redirect('/');
-//     })
-//     .catch(err => {
-//         console.log(err);
-//     })
-// }
+      const receivers = [
+          {
+          email: `${req.body.email}`
+          }
+      ]
+
+      await tranEmailApi.sendTransacEmail({
+          sender,
+          to: receivers,
+          subject: 'Reset Password',
+          textContent: `Password Reset`
+      }).then(res=>console.log(res)).catch(err=>console.log(err))
+      res.status(201).json({success: true,message: 'Reset Password Success'})
+  } catch(err) {
+      console.log(err);
+  }
+}

@@ -12,4 +12,6 @@ router.use('/home/expense',auth.auth,expenseController.createExpense)
 router.get('/home/show',auth.auth,expenseController.displayAll)
 router.get('/home/delete/:expenseId',auth.auth,expenseController.deleteExpense)
 router.post('/home/edit-expense/:expenseId', expenseController.editExpense);
+router.get('/password', userController.forgot);
+router.post('/password/forgotpassword', userController.postForgotPassword);
 module.exports=router

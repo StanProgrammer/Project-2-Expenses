@@ -48,6 +48,7 @@ form.addEventListener('submit', async (e) => {
         console.log(error);    
     }
 })
+
 function parseJwt (token) {
     var base64Url = token.split('.')[1];
     var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -57,15 +58,19 @@ function parseJwt (token) {
 
     return JSON.parse(jsonPayload);
 }
+function enablePremium(){
+    document.getElementById('premium').setAttribute('hidden','hidden');
+    document.getElementById('leaderboard-btn').removeAttribute('hidden');
+    document.getElementById('if-premium').innerHTML = '<p>You are now a Premium User</p>' + document.getElementById('if-premium').innerHTML;
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
     try {
         const decodeToken = parseJwt(token);
         // console.log(decodeToken);
         const isAdmin = decodeToken.isPremiumUser;
         if(isAdmin){
-            document.getElementById('premium').setAttribute('hidden','hidden');
-            document.getElementById('leaderboard-btn').removeAttribute('hidden');
-            document.getElementById('if-premium').innerHTML = '<p>You are now a Premium User</p>' + document.getElementById('if-premium').innerHTML;
+            enablePremium()
         }
         const res = await axios.get('http://localhost:3000/home/show',{ headers: {'Authorization': token}
         })
@@ -165,9 +170,8 @@ document.getElementById('premium').onclick = async function (e) {
         }, { headers: { "authorization": token } })
         alert("You are now a premium user")
         localStorage.setItem('token',result.data.token);
-        document.getElementById('premium').setAttribute('hidden','hidden');
-        document.getElementById('leaderboard-btn').removeAttribute('hidden');
-        document.getElementById('if-premium').innerHTML='<h4>You are now a Premium User</h4>';
+        enablePremium()
+        window.location.reload()
         }
     }
 
@@ -192,7 +196,7 @@ axios.get("http://localhost:3000/premium/show-leaderboard", { headers: { "author
             const li = document.createElement("li");
             li.id = "leaderboard-li"
             li.appendChild(document.createTextNode(` Name : ${res.data[i].name} ,`));
-            li.appendChild(document.createTextNode(`Total Expense :${res.data[i].totalExpense || 0}`));
+            li.appendChild(document.createTextNode(`Total Expense : ₹${res.data[i].totalExpense || 0}`));
             leaderboardElements.push(li);
         }
     })
@@ -202,18 +206,46 @@ axios.get("http://localhost:3000/premium/show-leaderboard", { headers: { "author
 
 leaderboardBtn.onclick = (e) => {
     e.preventDefault();
-    document.getElementById('leaderboard-tracker').removeAttribute('hidden');
 
     if (leaderboardDisplayed) {
         leaderboardBtn.innerHTML = 'Show Leaderboard';
+        document.getElementById('leaderboard-tracker').setAttribute('hidden', 'hidden');
         leaderboardList.style.display = 'none';
         leaderboardDisplayed = false;
     } else {
         leaderboardBtn.innerHTML = 'Hide Leaderboard';
+        document.getElementById('leaderboard-tracker').removeAttribute('hidden');
         leaderboardList.style.display = 'block';
         leaderboardElements.forEach(element => {
             leaderboardList.append(element)
         });
         leaderboardDisplayed = true;
     }
+}
+
+let reportBtn = document.getElementById('report-btn');
+let reportDisplayed = false;
+console.log(reportBtn);
+reportBtn.onclick = (e) => {
+    e.preventDefault();
+    const decodeToken = parseJwt(token);
+    const isAdmin = decodeToken.isPremiumUser;
+
+    if(reportDisplayed){
+        reportDisplayed = false;
+        document.getElementById('initial-tracker').removeAttribute('hidden');
+        reportBtn.innerHTML = ' Expenses Report ';
+        document.getElementById('report-dwn-btn').setAttribute('hidden','hidden');
+        document.getElementById('report-tracker').setAttribute('hidden','hidden');
+
+    } else {
+        reportDisplayed = true;
+        document.getElementById('initial-tracker').setAttribute('hidden','hidden');
+        reportBtn.innerHTML = 'Hide Expenses Report';
+        if(isAdmin){
+        document.getElementById('report-dwn-btn').removeAttribute('hidden');
+        }
+        document.getElementById('report-tracker').removeAttribute('hidden');
+    }
+
 }

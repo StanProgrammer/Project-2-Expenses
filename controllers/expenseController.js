@@ -63,22 +63,26 @@ exports.deleteExpense = async (req, res, next) => {
 
 exports.editExpense = async (req,res,next)=>{
     try{
+    const token = req.header('Authorization');
+    const user = jwt.verify(token, SECRET_KEY);
+    const id=user.id
     const expenseId = req.params.expenseId;
     const amount = req.body.amount;
     const description = req.body.description;
     const category = req.body.category;
+    console.log(req.user);
     const befExpense = await Expense.findByPk(expenseId,{
         attributes: ['amount'],
         raw: true
     });
-    const chUser = await User.findByPk(req.user.dataValues.id,{
+    const chUser = await User.findByPk(id,{
         attributes: ['totalExpense'],
         raw: true
     })
     const updatedExpense = +chUser.totalExpense - +befExpense.amount + +amount;
     const updatedUser = await User.update({
         totalExpense: updatedExpense
-    },{where: {id:req.user.dataValues.id}})
+    },{where: {id:id}})
 
     const data = await Expense.update({
         amount: amount,

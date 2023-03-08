@@ -3,6 +3,7 @@ let amount = document.querySelector('#amount');
 let description = document.querySelector('#description');
 let category = document.querySelector('#category');
 const token = localStorage.getItem('token');
+let editing =0
 expense = {
     amount: amount.value,
     description: description.value,
@@ -10,21 +11,39 @@ expense = {
 }
 form.addEventListener('submit', async (e) => {
     e.preventDefault()
+    let amount = document.querySelector('#amount');
+    let category = document.querySelector('#category');
+    let description = document.querySelector('#description');
+    let expense = {
+        amount: amount.value,
+        description: description.value,
+        category: category.value
+    }
     try {
-        let amount = document.querySelector('#amount');
-        let category = document.querySelector('#category');
-        let description = document.querySelector('#description');
-        let expense = {
-            amount: amount.value,
-            description: description.value,
-            category: category.value
-        }
+        if(editing==0){
+            // console.log('hello');
+        
         const token = localStorage.getItem('token')
        
         const post = await axios.post('http://localhost:3000/home/expense', expense, { headers: {'Authorization': token}})
         
         window.location.reload()
         document.querySelector("#my-form").reset();
+    }
+        else {
+            console.log('hello');
+            await axios.post(`/home/edit-expense/${editing}`,expense, { headers: {'Authorization': token} })
+            .then((response) => {
+                window.location.reload()
+                // const parRes = JSON.parse(response.config.data);
+                // console.log(parRes);
+                // addExpence(parRes);
+            }).catch((err) => {
+                document.body.innerHTML+= '<h6> Submit failed try again</h6>'
+                console.log(err);      
+            });
+            editing = 0;
+        }
     } catch(error) {
         console.log(error);    
     }
@@ -41,6 +60,7 @@ function parseJwt (token) {
 document.addEventListener('DOMContentLoaded', async () => {
     try {
         const decodeToken = parseJwt(token);
+        // console.log(decodeToken);
         const isAdmin = decodeToken.isPremiumUser;
         if(isAdmin){
             document.getElementById('premium').setAttribute('hidden','hidden');
@@ -78,25 +98,16 @@ async function addExpence(res) {
         ebtn.appendChild(document.createTextNode(`Edit`))
         ebtn.onclick = async () => {
             try {
-                await axios.post(`http://localhost:3000/home/edit-expense/${res.id}`,res, { headers: {'Authorization': token} })
-                
-                .then((response) => {
-                    window.location.reload()
-                    document.getElementById('amount').value = res.amount
-                    document.getElementById('description').value = res.description
-                    document.getElementById('category').value = res.category
-                    // const parRes = JSON.parse(response.config.data);
-                    // addNewLineElement(parRes);
-                }).catch((err) => {
-                    document.body.innerHTML+= '<h6> Submit failed try again</h6>'
-                    console.log(err);      
-                });
+                editing=res.id
+                console.log(editing);
                 var e = document.getElementById(li.id)
                 var ul = e.parentElement
-                const delte1 = await axios.get(`http://localhost:3000/home/delete/${res.id}`,{ headers: {'Authorization': token} })
+                // const delte1 = await axios.get(`http://localhost:3000/home/delete/${res.id}`,{ headers: {'Authorization': token} })
                 ul.removeChild(e)
                 let b = JSON.parse(localStorage.getItem("amount"))
-                
+                document.getElementById('amount').value = res.amount
+                document.getElementById('description').value = res.description
+                document.getElementById('category').value = res.category
             } catch (err) {
                 console.log(err);
             }

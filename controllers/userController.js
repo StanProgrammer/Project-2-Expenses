@@ -19,7 +19,7 @@ exports.createUser = async (req, res, next) => {
 
     const saltrounds = 10
     const hashPassword = await bcrypt.hash(password, saltrounds)
-    const result = await User.create({ name: name, email: email, phone: phone, password: hashPassword, isPremiumUser: false })
+    const result = await User.create({ name: name, email: email, phone: phone, password: hashPassword, isPremiumUser: false,  totalExpense: 0  })
     const token = jwt.sign({ email: result.email, id: result.id }, SECRET_KEY)
     res.status(201).json({ message: 'Successfully Created', token: token, userId: result.id })
 

@@ -41,7 +41,6 @@ function parseJwt (token) {
 document.addEventListener('DOMContentLoaded', async () => {
     try {
         const decodeToken = parseJwt(token);
-        console.log(decodeToken);
         const isAdmin = decodeToken.isPremiumUser;
         if(isAdmin){
             document.getElementById('premium').setAttribute('hidden','hidden');
@@ -79,14 +78,25 @@ async function addExpence(res) {
         ebtn.appendChild(document.createTextNode(`Edit`))
         ebtn.onclick = async () => {
             try {
+                await axios.post(`http://localhost:3000/home/edit-expense/${res.id}`,res, { headers: {'Authorization': token} })
+                
+                .then((response) => {
+                    window.location.reload()
+                    document.getElementById('amount').value = res.amount
+                    document.getElementById('description').value = res.description
+                    document.getElementById('category').value = res.category
+                    // const parRes = JSON.parse(response.config.data);
+                    // addNewLineElement(parRes);
+                }).catch((err) => {
+                    document.body.innerHTML+= '<h6> Submit failed try again</h6>'
+                    console.log(err);      
+                });
                 var e = document.getElementById(li.id)
                 var ul = e.parentElement
                 const delte1 = await axios.get(`http://localhost:3000/home/delete/${res.id}`,{ headers: {'Authorization': token} })
                 ul.removeChild(e)
                 let b = JSON.parse(localStorage.getItem("amount"))
-                document.getElementById('amount').value = res.amount
-                document.getElementById('description').value = res.description
-                document.getElementById('category').value = res.category
+                
             } catch (err) {
                 console.log(err);
             }
@@ -170,7 +180,7 @@ axios.get("http://localhost:3000/premium/show-leaderboard", { headers: { "author
             const li = document.createElement("li");
             li.id = "leaderboard-li"
             li.appendChild(document.createTextNode(` Name : ${res.data[i].name} ,`));
-            li.appendChild(document.createTextNode(`Total Expense : ${res.data[i].total_cost || 0}`));
+            li.appendChild(document.createTextNode(`Total Expense : ${res.data[i].totalExpense || 0}`));
             leaderboardElements.push(li);
         }
     })

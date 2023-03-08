@@ -5,24 +5,31 @@ const bcrypt = require('bcrypt')
 const Expense = require('../models/expense')
 const jwt = require('jsonwebtoken')
 const SECRET_KEY = 'ATIBAPI'
-exports.createExpense = (req, res, next) => {
+exports.createExpense = async(req, res, next) => {
+    try{
     const token = req.header('Authorization');
     const user = jwt.verify(token, SECRET_KEY);
     const id=user.id
     const amount = req.body.amount
     const description = req.body.description
     const category = req.body.category
-    Expense.create({
+    const data=await Expense.create({
         amount: amount,
         description: description,
         category: category,
         userId: id
     })
-        .then(() => {
-            res.redirect('/home')
-        })
-        .catch(err => { console.log(err); })
+    const tExpense = +req.user.totalExpense + +amount;
+    User.update(
+        { totalExpense: tExpense},
+        {where: {id:req.user.id}}
+        )
+    res.status(201).json( data);
+    } catch (err) {
+        res.status(500).json({error:err})
+    } 
 }
+
 
 exports.displayAll = (req, res, next) => {
     const token = req.header('Authorization');
@@ -52,4 +59,35 @@ exports.deleteExpense = async (req, res, next) => {
 }catch(error){
     console.log(error);
 }
+}
+
+exports.editExpense = async (req,res,next)=>{
+    try{
+    const expenseId = req.params.expenseId;
+    const amount = req.body.amount;
+    const description = req.body.description;
+    const category = req.body.category;
+    const befExpense = await Expense.findByPk(expenseId,{
+        attributes: ['amount'],
+        raw: true
+    });
+    const chUser = await User.findByPk(req.user.dataValues.id,{
+        attributes: ['totalExpense'],
+        raw: true
+    })
+    const updatedExpense = +chUser.totalExpense - +befExpense.amount + +amount;
+    const updatedUser = await User.update({
+        totalExpense: updatedExpense
+    },{where: {id:req.user.dataValues.id}})
+
+    const data = await Expense.update({
+        amount: amount,
+        description:description,
+        category:category
+    },{where: {id:expenseId}});
+    res.status(201).json( data);
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({error:err})
+    } 
 }

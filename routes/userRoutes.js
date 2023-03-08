@@ -11,4 +11,5 @@ router.get('/home',userController.homePage)
 router.use('/home/expense',auth.auth,expenseController.createExpense)
 router.get('/home/show',auth.auth,expenseController.displayAll)
 router.get('/home/delete/:expenseId',auth.auth,expenseController.deleteExpense)
+router.post('/home/edit-expense/:expenseId', expenseController.editExpense);
 module.exports=router

@@ -7,7 +7,6 @@ async function uploadToS3(data, filename){
         accessKeyId: process.env.IAM_USER_KEY,
         secretAccessKey: process.env.IAM_USER_SECRET,
     });
-    console.log(s3bucket);
     var params = {
         Bucket: 'expensetrackingapp111',
         Key: filename,
@@ -17,7 +16,7 @@ async function uploadToS3(data, filename){
     return new Promise((resolve,reject)=>{
         s3bucket.upload(params, (err,s3response)=> {
             if(err) {
-                console.log('Error Occured>>>>',err);
+                console.log('Error Occured');
                 reject(err);
             } else {
                 resolve(s3response.Location);

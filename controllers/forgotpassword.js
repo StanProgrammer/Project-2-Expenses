@@ -15,9 +15,9 @@ exports.postForgotPassword = async (req,res,next) => {
         if(userFound){
             const id = uuid.v4();
             await userFound.createForgotpassword({ id , active: true },{transaction: sequelizeTransaction})
-                .catch(err => {
-                    console.log(err);
-                    throw new Error(err)
+                .catch(error => {
+                    console.log(error);
+                    throw new Error(error)
                 });
 
             const client = Sib.ApiClient.instance;

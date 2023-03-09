@@ -45,11 +45,9 @@ exports.checkUser = async (req, res, next) => {
     const email = req.body.email
     const password = req.body.password
     const user1 = await User.findOne({ where: { email: email } })
-    // console.log(user1);
     if (!user1) {
       res.status(404).json({ message: 'User Doesnt Exists' })
     }
-    // console.log(user1);
     const hash = user1.dataValues.password
     await bcrypt.compare(password, hash, function (err, result) {
       if (result == false) {

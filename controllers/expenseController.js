@@ -79,7 +79,6 @@ exports.displayAll = async (req, res, next) => {
     const token = req.header('Authorization');
     const user = jwt.verify(token, SECRET_KEY);
     const id=user.id
-    console.log(id);
     // const result = await Expense.findAll({where:{userId: id}})
     // res.json(result)
     let page = req.params.pageNo || 1;

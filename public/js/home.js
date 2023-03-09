@@ -1,7 +1,8 @@
+
 let editingExpenseId = 0;
 const token = localStorage.getItem('token');
-
 const expense = document.getElementById('expense');
+const dynamicPage = document.getElementById('dynamic-pagination');
 expense.addEventListener('submit', onSubmit);
 
 function onSubmit(e){
@@ -63,7 +64,6 @@ if (document.readyState == "loading" ){
     // axios.get('http://localhost:3000/home/show', { headers: {'Authorization': token} } )
     axios.get(`/home/show/${currentPage}`,{params: {perpage}, headers: {'Authorization': token} } )
         .then((result) => {
-            console.log('result.data>>>>>',result.data);
             result.data.data.forEach(element => {
                 addNewLineElement(element);
             });
@@ -75,7 +75,7 @@ if (document.readyState == "loading" ){
         }
     );
 };
-const dynamicPage = document.getElementById('dynamic-pagination');
+
 dynamicPage.addEventListener('submit',(e)=>{
     e.preventDefault();
     const perpage = document.getElementById('perpage').value;
@@ -114,7 +114,6 @@ function addNewLineElement(expenseDetails){
         document.getElementById('category').value = expenseDetails.category;
         li.remove();
         editingExpenseId = expenseDetails.id;
-        console.log(editingExpenseId);
     });
     editBtn.style.border = '2px solid green';
     li.appendChild(editBtn);
@@ -197,13 +196,11 @@ let reportDisplayed = false;
     axios.get('http://localhost:3000/getAllUrl',{headers: {'Authorization' : token}})
     .then((res) => {
         if(res.status === 200){
-            console.log(res)
             showUrls(res.data)
         }
     }).catch(err=> console.log(err));
 
     function showUrls(data){
-    console.log('ShowUrls>>>',data.urls);
         data.urls.forEach(url => {
             const li= document.createElement('a');
             li.id = 'report-list-li';
@@ -258,7 +255,6 @@ reportDwnBtn.addEventListener('click', (e)=> {
 });
 
 function showUrlOnScreen(data){
-    console.log('showUrlOnScreen>>>' , data);
     const li= document.createElement('a');
     li.id = 'report-list-li';
     li.href = `${data.fileURL}`;

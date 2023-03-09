@@ -5,7 +5,8 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon app.js"
+    "start": "nodemon app.js",
+    "start:dev": "nodemon app.js"
   },
   "author": "Atib",
   "license": "ISC",
@@ -19,6 +20,7 @@
     "express-session": "^1.17.3",
     "jsonwebtoken": "^9.0.0",
     "local-storage": "^2.0.0",
+    "morgan": "^1.10.0",
     "mysql2": "^3.2.0",
     "razorpay": "^2.8.6",
     "sequelize": "^6.29.0",

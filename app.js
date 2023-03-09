@@ -7,7 +7,8 @@ const Expense = require('./models/expense')
 const Order = require('./models/order');
 const Forgotpassword = require('./models/forgotpassword');
 const DownloadUrl = require('./models/downloadUrl');
-
+const helmet = require('helmet');
+const morgan = require('morgan');
 const cors = require('cors');
 const sequelize = require('./util/database');
 const dotenv = require('dotenv');
@@ -40,7 +41,7 @@ DownloadUrl.belongsTo(User);
 
 sequelize.sync()
 .then(
-app.listen('3000',()=>{
+app.listen(`${process.env.PORT}`,()=>{
   console.log('no error');
 }))
 .catch(err=>{console.log(err);})

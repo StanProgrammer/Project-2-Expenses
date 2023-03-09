@@ -83,7 +83,8 @@ exports.displayAll = async (req, res, next) => {
     // const result = await Expense.findAll({where:{userId: id}})
     // res.json(result)
     let page = req.params.pageNo || 1;
-        let Items_Per_Page = 5;
+        // let Items_Per_Page = 10;
+        let Items_Per_Page = +req.query.perpage;
         const totalItems = await Expense.count({where: {userId: id}});
         const data = await req.user.getExpenses({offset: (page-1)*Items_Per_Page,limit: Items_Per_Page})
 

@@ -1,53 +1,40 @@
-let form = document.querySelector("#my-form");
-let amount = document.querySelector('#amount');
-let description = document.querySelector('#description');
-let category = document.querySelector('#category');
+let editingExpenseId = 0;
 const token = localStorage.getItem('token');
-let editing =0
-expense = {
-    amount: amount.value,
-    description: description.value,
-    category: category.value
-}
-form.addEventListener('submit', async (e) => {
-    e.preventDefault()
-    let amount = document.querySelector('#amount');
-    let category = document.querySelector('#category');
-    let description = document.querySelector('#description');
-    let expense = {
-        amount: amount.value,
-        description: description.value,
-        category: category.value
+
+const expense = document.getElementById('expense');
+expense.addEventListener('submit', onSubmit);
+
+function onSubmit(e){
+    e.preventDefault();
+
+    let expenseObj = {
+        amount: document.getElementById('amount').value,
+        description: document.getElementById('description').value,
+        category: document.getElementById('category').value
     }
-    try {
-        if(editing==0){
-            // console.log('hello');
-        
-        const token = localStorage.getItem('token')
-       
-        const post = await axios.post('http://localhost:3000/home/expense', expense, { headers: {'Authorization': token}})
-        
-        window.location.reload()
-        document.querySelector("#my-form").reset();
-    }
-        else {
-            console.log('hello');
-            await axios.post(`/home/edit-expense/${editing}`,expense, { headers: {'Authorization': token} })
-            .then((response) => {
-                window.location.reload()
-                // const parRes = JSON.parse(response.config.data);
-                // console.log(parRes);
-                // addExpence(parRes);
-            }).catch((err) => {
-                document.body.innerHTML+= '<h6> Submit failed try again</h6>'
-                console.log(err);      
-            });
-            editing = 0;
+    
+
+    if(editingExpenseId === 0){
+        axios.post('http://localhost:3000/home/expense', expenseObj, { headers: {'Authorization': token} })
+        .then((response) => {
+            addNewLineElement(response.data)
+        }).catch((err) => {
+            document.body.innerHTML+= '<h6> Submit failed try again</h6>'
+            console.log(err);      
         }
-    } catch(error) {
-        console.log(error);    
+        );
+    } else {
+        axios.post(`http:/localhost:3000/home/edit-expense/${editingExpenseId}`,expenseObj, { headers: {'Authorization': token} })
+        .then((response) => {
+            const parRes = JSON.parse(response.config.data);
+            addNewLineElement(parRes);
+        }).catch((err) => {
+            document.body.innerHTML+= '<h6> Submit failed try again</h6>'
+            console.log(err);      
+        });
+        editingExpenseId = 0;
     }
-})
+}
 
 function parseJwt (token) {
     var base64Url = token.split('.')[1];
@@ -58,108 +45,79 @@ function parseJwt (token) {
 
     return JSON.parse(jsonPayload);
 }
+
 function enablePremium(){
     document.getElementById('premium').setAttribute('hidden','hidden');
     document.getElementById('leaderboard-btn').removeAttribute('hidden');
     document.getElementById('if-premium').innerHTML = '<p>You are now a Premium User</p>' + document.getElementById('if-premium').innerHTML;
 }
 
-document.addEventListener('DOMContentLoaded', async () => {
-    try {
-        const decodeToken = parseJwt(token);
-        // console.log(decodeToken);
-        const isAdmin = decodeToken.isPremiumUser;
-        if(isAdmin){
-            enablePremium()
-        }
-        const res = await axios.get('http://localhost:3000/home/show',{ headers: {'Authorization': token}
-        })
-        res.data.forEach((element) => {
-            addExpence(element)
-        })
-    }
-    catch (err) {
-        alert('Error occured please check')
-        console.log(err)
-        throw new Error()
-    }
-})
-async function addExpence(res) {
-    try {
-        let ul = document.getElementById("items");
-        let li = document.createElement('li')
-        let btn = document.createElement('button')
-        li.className = 'card mt-3'
-        btn.className = 'form-control bg-danger'
-        li.id = res.id
-        btn.value = 'delete'
-        btn.onclick = () => {
-            delete11(res.id)
-        }
-        btn.appendChild(document.createTextNode(`Delete`))
-        let ebtn = document.createElement('button')
-        ebtn.className = 'form-control bg-info'
-        ebtn.value = 'edit'
-        ebtn.appendChild(document.createTextNode(`Edit`))
-        ebtn.onclick = async () => {
-            try {
-                editing=res.id
-                console.log(editing);
-                var e = document.getElementById(li.id)
-                var ul = e.parentElement
-                // const delte1 = await axios.get(`http://localhost:3000/home/delete/${res.id}`,{ headers: {'Authorization': token} })
-                ul.removeChild(e)
-                let b = JSON.parse(localStorage.getItem("amount"))
-                document.getElementById('amount').value = res.amount
-                document.getElementById('description').value = res.description
-                document.getElementById('category').value = res.category
-            } catch (err) {
-                console.log(err);
-            }
-        }
-        li.innerHTML = `<table class="table">
-                        <tbody>
-                        <tr>
-                            <th scope="row">Price</th>
-                            <td>${res.amount}</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Product Name</th>
-                            <td>${res.description}</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Category</th>
-                            <td>${res.category}</td>
-                        </tr>
-                        </tbody>
-                    </table>`
-        li.appendChild(btn)
-        li.appendChild(ebtn)
-        ul.appendChild(li)
+let currentPage = 1;
+let lastFEPage=1;
 
-    }
-    catch (err) {
-        alert('Error occured')
-        console.log(err)
-        throw new Error()
-    }
-}
-async function delete11(id) {
-    try {
-        if (confirm('Are you sure?')) {
-            var e = document.getElementById(id)
-            var ul = e.parentElement
-            const delte1 = await axios.get(`http://localhost:3000/home/delete/${id}`,  { headers: {'Authorization': token} })
-            ul.removeChild(e)
-            window.location.reload()
-        };
-    } catch (err) {
-        console.log(err);
-    }
+if (document.readyState == "loading" ){
+    const decodeToken = parseJwt(token);
+    const isAdmin = decodeToken.isPremiumUser;
+    if(isAdmin){enablePremium()}
+
+    // axios.get('http://localhost:3000/home/show', { headers: {'Authorization': token} } )
+    axios.get(`/home/show/${currentPage}`, { headers: {'Authorization': token} } )
+        .then((result) => {
+            console.log('result.data>>>>>',result.data);
+            result.data.data.forEach(element => {
+                addNewLineElement(element);
+            });
+            showPagination(result.data.info);
+            lastFEPage = result.data.info.lastPage;
+        }).catch((err) => {
+            console.log(err);
+            document.body.innerHTML+= '<h6> Error: Failed to load data from server</h6>'
+        }
+    );
 };
+
+function addNewLineElement(expenseDetails){
+    const ul = document.getElementById('tracker');
+    const li = document.createElement('li');
+
+    li.appendChild(
+        document.createTextNode('₹' + expenseDetails.amount + ' - Category:' + expenseDetails.category + ' - Description:' + expenseDetails.description + ' ')
+    );
+        const id=expenseDetails.id
+    
+
+    const delBtn = document.createElement('input');
+    delBtn.id='delete';
+    delBtn.type='button';
+    delBtn.value='delete';
+    delBtn.addEventListener('click', ()=> {
+        axios.get(`http://localhost:3000/home/delete/${id}`, { headers: {'Authorization': token} })
+        li.remove();
+    });
+    delBtn.style.border = '2px solid red';
+    delBtn.style.marginRight = '5px'
+    li.appendChild(delBtn);
+    
+    const editBtn = document.createElement('input');
+    editBtn.id='edit';
+    editBtn.type='button';
+    editBtn.value='Edit';
+    editBtn.addEventListener('click', ()=> {
+        document.getElementById('amount').value = expenseDetails.amount;
+        document.getElementById('description').value = expenseDetails.description;
+        document.getElementById('category').value = expenseDetails.category;
+        li.remove();
+        editingExpenseId = expenseDetails.id;
+        console.log(editingExpenseId);
+    });
+    editBtn.style.border = '2px solid green';
+    li.appendChild(editBtn);
+    ul.appendChild(li);
+}
+
 document.getElementById('premium').onclick = async function (e) {
-    const response  = await axios.get('http://localhost:3000/purchase/premium-membership',  { headers: {"Authorization" : token} });
-    console.log(response);
+    const response  = await axios.get('http://localhost:3000/purchase/premium-membership', { headers: {"Authorization" : token} });
+    
     var options =
     {
      "key": response.data.key_id,
@@ -167,24 +125,26 @@ document.getElementById('premium').onclick = async function (e) {
      "handler": async function (response) {
         const result = await axios.post("http://localhost:3000/purchase/update-transaction-status", {
             order_id: options.order_id, payment_id: response.razorpay_payment_id
-        }, { headers: { "authorization": token } })
-        alert("You are now a premium user")
+        }, { headers: { "authorization": token } });
+
+        alert("You are now a premium user");
         localStorage.setItem('token',result.data.token);
-        enablePremium()
-        window.location.reload()
+        enablePremium();
+        location.reload();
         }
     }
 
     const rzrp1 = new Razorpay(options);
     rzrp1.open();
     e.preventDefault();
-
+    
     rzrp1.on("payment.failed", () => {
         axios.post("http://localhost:3000/purchase/update-transaction-status", { order_id: response.data.order.id }, { headers: { "authorization": token } })
         alert("something went wrong");
         rzrp1.close()
     })
 }
+    
 let leaderboardDisplayed = false;
 let leaderboardElements = [];
 let leaderboardList = document.getElementById('leaderboard-list');
@@ -250,31 +210,7 @@ let reportDisplayed = false;
         })
     }
     
-    let mybtn = document.getElementById('mybtn')
-    mybtn.addEventListener('click',(e)=>{
-        console.log(1);
-        e.preventDefault();
-        const decodeToken = parseJwt(token);
-        const isAdmin = decodeToken.isPremiumUser;
-    
-        if(reportDisplayed){
-            reportDisplayed = false;
-            document.getElementById('initial-tracker').removeAttribute('hidden');
-            reportBtn.innerHTML = ' Expenses Report ';
-            document.getElementById('report-dwn-btn').setAttribute('hidden','hidden');
-            document.getElementById('report-tracker').setAttribute('hidden','hidden');
-    
-        } else {
-            reportDisplayed = true;
-            document.getElementById('initial-tracker').setAttribute('hidden','hidden');
-            reportBtn.innerHTML = 'Hide Expenses Report';
-            if(isAdmin){
-            document.getElementById('report-dwn-btn').removeAttribute('hidden');
-            }
-            document.getElementById('report-tracker').removeAttribute('hidden');
-        }
-    
-    })
+
 reportBtn.onclick = async (e) => {
     e.preventDefault();
     const decodeToken = parseJwt(token);
@@ -301,9 +237,8 @@ reportBtn.onclick = async (e) => {
 
 const reportDwnBtn = document.getElementById('report-dwn-btn');
 reportDwnBtn.addEventListener('click', (e)=> {
-    console.log('name');
     e.preventDefault();
-    axios.get('http:localhost:3000/expense/download', { headers: { "authorization": token } }).then((response) => {
+    axios.get('download', { headers: { "authorization": token } }).then((response) => {
             console.log(response);
             showUrlOnScreen(response.data.downloadUrlData);
             var a = document.createElement("a");
@@ -328,3 +263,52 @@ function showUrlOnScreen(data){
     listno++;
 }
 
+function showPagination({currentPage,hasNextPage,hasPreviousPage,nextPage,previousPage,lastPage}){
+    const pagination = document.getElementById('pagination');
+    pagination.innerHTML = '';
+
+    if(hasPreviousPage){
+        const btn2 = document.createElement('button');
+        btn2.innerHTML = previousPage ;
+        btn2.addEventListener('click' , ()=>getPageExpenses(previousPage));
+        pagination.appendChild(btn2);
+    }
+
+    const btn1 = document.createElement('button');
+    btn1.innerHTML = currentPage ;
+    btn1.addEventListener('click' , ()=>getPageExpenses(currentPage));
+    pagination.appendChild(btn1);
+
+    if(hasNextPage){
+        const button3 = document.createElement('button');
+        button3.innerHTML = nextPage ;
+        button3.addEventListener('click' , ()=>getPageExpenses(nextPage));
+        pagination.appendChild(button3);
+    }
+
+    if( currentPage!=lastPage && nextPage!=lastPage && lastPage != 0){
+        const button3 = document.createElement('button');
+        button3.innerHTML = lastPage ;
+        button3.addEventListener('click' , ()=>getPageExpenses(page));
+        pagination.appendChild(button3);
+    }
+}
+
+async function getPageExpenses(page){
+    currentPage = page;
+    const tracker = document.getElementById('tracker');
+
+    const token = localStorage.getItem('token');
+
+    let response = await axios.get(`http://localhost:3000/home/show/${page}`,{headers: { "Authorization": token}} );
+
+    console.log('fun: get page expenses>>',response.data.info);
+    if(response.status === 200){
+        tracker.innerHTML = ''
+        for(let i=0;i<response.data.data.length;i++){
+            addNewLineElement(response.data.data[i]);
+        }
+    }
+
+    showPagination(response.data.info)
+}

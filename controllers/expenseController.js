@@ -80,8 +80,24 @@ exports.displayAll = async (req, res, next) => {
     const user = jwt.verify(token, SECRET_KEY);
     const id=user.id
     console.log(id);
-    const result = await Expense.findAll({where:{userId: id}})
-    res.json(result)
+    // const result = await Expense.findAll({where:{userId: id}})
+    // res.json(result)
+    let page = req.params.pageNo || 1;
+        let Items_Per_Page = 5;
+        const totalItems = await Expense.count({where: {userId: id}});
+        const data = await req.user.getExpenses({offset: (page-1)*Items_Per_Page,limit: Items_Per_Page})
+
+        res.status(200).json({
+            data,
+            info: {
+                currentPage: page,
+                hasNextPage: totalItems > page * Items_Per_Page,
+                hasPreviousPage: page > 1,
+                nextPage: +page + 1,
+                previousPage: +page - 1,
+                lastPage: Math.ceil(totalItems / Items_Per_Page) 
+            }
+        });
     }catch(error){
         console.log(error);
     }

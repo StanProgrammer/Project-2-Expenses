@@ -3,12 +3,12 @@ const AWS = require('aws-sdk');
 async function uploadToS3(data, filename){
 
     let s3bucket = new AWS.S3({
-        accessKeyId: process.env.IAM_USER_KEY,
-        secretAccessKey: process.env.IAM_USER_SECRET
+        accessKeyId: 'AKIA44JZUOQGDETBRZVH',
+        secretAccessKey: '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'
     });
-
+    console.log(s3bucket);
     var params = {
-        Bucket: process.env.BUCKET_NAME,
+        Bucket: 'expensetrackingapp111',
         Key: filename,
         Body: data,
         ACL: 'public-read'

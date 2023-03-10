@@ -25,9 +25,9 @@ function onSubmit(e){
         }
         );
     } else {
-        axios.post(`http:/localhost:3000/home/edit-expense/${editingExpenseId}`,expenseObj, { headers: {'Authorization': token} })
+        axios.post(`/home/edit-expense/${editingExpenseId}`,expenseObj, { headers: {'Authorization': token} })
         .then((response) => {
-            const parRes = JSON.parse(response.config.data);
+            window.location.reload()
             addNewLineElement(parRes);
         }).catch((err) => {
             document.body.innerHTML+= '<h6> Submit failed try again</h6>'
@@ -50,7 +50,7 @@ function parseJwt (token) {
 function enablePremium(){
     document.getElementById('premium').setAttribute('hidden','hidden');
     document.getElementById('leaderboard-btn').removeAttribute('hidden');
-    document.getElementById('if-premium').innerHTML = '<p>You are now a Premium User</p>' + document.getElementById('if-premium').innerHTML;
+    document.getElementById('if-premium').innerHTML = '<a class="btn btn-dark px-3" role="button" disabled><i class="fab fa-github">Premium User</i></a>' + document.getElementById('if-premium').innerHTML;
 }
 
 let currentPage = 1;
@@ -85,20 +85,36 @@ dynamicPage.addEventListener('submit',(e)=>{
 function addNewLineElement(expenseDetails){
     const ul = document.getElementById('tracker');
     const li = document.createElement('li');
-
-    li.appendChild(
-        document.createTextNode('₹' + expenseDetails.amount + ' - Category:' + expenseDetails.category + ' - Description:' + expenseDetails.description + ' ')
-    );
-        const id=expenseDetails.id
-    
-
+    li.innerHTML = `
+                    <div class="card">
+                    <table class="table">
+                        <tbody>
+                        <tr>
+                            <th scope="row">Price</th>
+                            <td>${expenseDetails.amount}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Product Name</th>
+                            <td>${expenseDetails.category}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Category</th>
+                            <td>${expenseDetails.description}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    </div>`
+    const id=expenseDetails.id
     const delBtn = document.createElement('input');
+    delBtn.className = 'form-control bg-danger'
     delBtn.id='delete';
     delBtn.type='button';
     delBtn.value='delete';
     delBtn.addEventListener('click', ()=> {
+        if(confirm('Are you sure?')){
         axios.get(`http://localhost:3000/home/delete/${id}`, { headers: {'Authorization': token} })
         li.remove();
+        }
     });
     delBtn.style.border = '2px solid red';
     delBtn.style.marginRight = '5px'
@@ -108,6 +124,7 @@ function addNewLineElement(expenseDetails){
     editBtn.id='edit';
     editBtn.type='button';
     editBtn.value='Edit';
+    editBtn.className = 'form-control bg-info'
     editBtn.addEventListener('click', ()=> {
         document.getElementById('amount').value = expenseDetails.amount;
         document.getElementById('description').value = expenseDetails.description;
@@ -242,7 +259,6 @@ const reportDwnBtn = document.getElementById('report-dwn-btn');
 reportDwnBtn.addEventListener('click', (e)=> {
     e.preventDefault();
     axios.get('download', { headers: { "authorization": token } }).then((response) => {
-            console.log(response);
             showUrlOnScreen(response.data.downloadUrlData);
             var a = document.createElement("a");
             a.href = response.data.fileURL;
@@ -271,6 +287,7 @@ function showPagination({currentPage,hasNextPage,hasPreviousPage,nextPage,previo
 
     if(hasPreviousPage){
         const btn2 = document.createElement('button');
+        btn2.className = "pagination"
         btn2.innerHTML = previousPage ;
         btn2.addEventListener('click' , ()=>getPageExpenses(previousPage));
         pagination.appendChild(btn2);

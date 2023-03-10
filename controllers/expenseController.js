@@ -128,6 +128,7 @@ exports.deleteExpense = async (req, res, next) => {
 }
 
 exports.editExpense = async (req,res,next)=>{
+    const sequelizeTransaction = await sequelize.transaction();
     try{
     const token = req.header('Authorization');
     const user = jwt.verify(token, SECRET_KEY);

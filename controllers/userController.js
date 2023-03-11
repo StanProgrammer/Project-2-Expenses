@@ -27,16 +27,16 @@ exports.generateAccessToken=(id, name,email, isPremiumUser) => {
 }
 
 exports.displaySignUp = (req, res, next) => {
-  res.sendFile(path.join(rootDir, 'views', 'signup.html'))
+  res.sendFile(path.join(rootDir, 'public', 'views', 'signup.html'))
 }
 exports.forgot = (req, res, next) => {
-  res.sendFile(path.join(rootDir, 'views', 'forgotpassword.html'))
+  res.sendFile(path.join(rootDir, 'public','views', 'forgotpassword.html'))
 }
 exports.loginPage = (req, res, next) => {
-  res.sendFile(path.join(rootDir, 'views', 'login.html'))
+  res.sendFile(path.join(rootDir, 'public', 'views', 'login.html'))
 }
 exports.homePage = (req, res, next) => {
-  res.sendFile(path.join(rootDir, 'views', 'home.html'),{headers: {'Authorization': `123`}})
+  res.sendFile(path.join(rootDir, 'public', 'views', 'home.html'),{headers: {'Authorization': `123`}})
 }
 
 exports.checkUser = async (req, res, next) => {

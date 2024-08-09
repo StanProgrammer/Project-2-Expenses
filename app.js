@@ -6,7 +6,9 @@ const cors = require("cors");
 const helmet = require("helmet");
 const morgan = require("morgan");
 
+
 const dotenv = require("dotenv");
+
 dotenv.config();
 
 const User = require("./models/users");
@@ -19,8 +21,8 @@ const userRoutes = require("./routes/userRoutes");
 const purchaseRoutes = require("./routes/purchaseRoutes");
 const premiumRoutes = require("./routes/premiumRoutes");
 const forgotpasswordRoutes = require("./routes/forgotRoutes");
-
 const sequelize = require("./util/database");
+
 const accessLogStream = fs.createWriteStream(path.join(__dirname, "access.log"), { flags: "a" });
 
 const app = express();

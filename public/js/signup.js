@@ -13,6 +13,7 @@ myForm.addEventListener('submit',async (e)=>{
     const password=document.getElementById('password')
     e.preventDefault()
     try{
+        
         const user1=await axios.post('http://localhost:3000/login',{
             name:name.value,
             email:email.value,

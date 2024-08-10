@@ -3,11 +3,11 @@ require('dotenv').config();
 
 async function uploadToS3(data, filename){
 
-    let s3bucket = new AWS.S3({
+    const s3bucket = new AWS.S3({
         accessKeyId: process.env.IAM_USER_KEY,
         secretAccessKey: process.env.IAM_USER_SECRET,
     });
-    var params = {
+    const params = {
         Bucket: 'expensetrackingapp111',
         Key: filename,
         Body: data,

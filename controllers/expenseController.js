@@ -1,4 +1,5 @@
 const path = require("path");
+
 const rootDir = path.dirname(require.main.filename);
 const User = require("../models/users");
 const bcrypt = require("bcrypt");

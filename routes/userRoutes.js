@@ -6,7 +6,7 @@ const expenseController = require('../controllers/expenseController')
 const auth = require('../middleware/auth')
 
 router.get('/',userController.displaySignUp)
-router.use('/login',userController.createUser)
+router.post('/signup',userController.createUser)
 router.get('/loginPage',userController.loginPage)
 router.use('/check',userController.checkUser)
 router.get('/home',userController.homePage)

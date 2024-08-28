@@ -86,28 +86,45 @@ myForm.addEventListener('submit', async (e) => {
 
     if (validateInput()) {
         try {
-            // eslint-disable-next-line no-undef
-            await fetch('http://localhost:3000/signup',{
+            const response = await fetch('http://localhost:3000/signup', {
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'
-                  },
-                  method: "POST",
-                  body:{
+                },
+                method: "POST",
+                body: JSON.stringify({
                     name: name.value,
                     email: email.value,
                     phone: phone.value,
                     password: password.value
+                })
+            });
+
+            if (response.status === 200) {
+                const data = await response.json();
+                // eslint-disable-next-line no-alert
+                alert(data.message);
+
+                if (data.statusCode === 200) {
+                    // Clear the form fields after successful submission
+                    window.location.href = "http://localhost:3000/loginPage";
                 }
-
-            })
-
-            window.location.href = "http://localhost:3000/loginPage";
+                else {
+                    
+                    name.value = '';
+                    email.value = '';
+                    phone.value = '';
+                    password.value = '';
+                    confirmPassword.value = '';
+                }
+            } 
+            
         } catch (error) {
             throw new Error(error.message);
         }
     }
 });
+
 
 loginbtn.addEventListener('click', () => {
     window.location.href = "http://localhost:3000/loginPage";
